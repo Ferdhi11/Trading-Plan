@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Trading Plan</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Picking & Trading Plan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: system-ui;
+            background: #0a192f; /* NAVY GELAP */
+            color: white;
+            text-align: center;
+        }
+         
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255,255,255,0.95);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .login-card h2 { color: #0a192f; margin-bottom: 20px; font-size: 2rem; }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+
+        .form-group label {
+            display: block;
+            color: #0a192f;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            color: #333;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1d4ed8, #0a192f);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .auth-toggle { margin-top: 20px; color: #666; font-size: 14px; }
+        .auth-toggle span { color: #1d4ed8; cursor: pointer; font-weight: bold; text-decoration: underline; }
+
+        .main-app { display: none; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .user-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .user-info {
+            background: rgba(255,255,255,0.1); 
+            padding: 15px 30px;
+            border-radius: 25px; 
+            color: white; 
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .tabs {
+            display: flex; background: rgba(255,255,255,0.95);
+            border-radius: 15px; padding: 5px; margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            flex: 1; padding: 15px 20px; border: none; background: transparent;
+            color: #6c757d; font-size: 16px; font-weight: 600; border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active { background: #0a192f; color: white; }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .empty-message {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            color: rgba(255,255,255,0.5);
+            font-size: 1.2rem;
+        }
+
+        .stock-preview {
+            background: white;
+            border-radius: 25px;
+            padding: 40px 30px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .stock-name { font-size: 2.2rem !important; font-weight: 800 !important; color: #0a192f !important; }
+
+        .status-large {
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding: 12px 25px;
+            border-radius: 50px;
+            margin: 15px auto;
+            text-transform: uppercase;
+        }
+
+        .status-floating { background: #1d4ed8; color: white; }
+        .status-bep { background: #28a745; color: white; }
+        .status-sold { background: #dc3545; color: white; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white; margin: 5% auto; width: 90%; max-width: 800px;
+            border-radius: 25px; padding: 40px; color: #333;
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        .admin-form, .admin-only { display: none; }
+        .admin-user .admin-form, .admin-user .admin-only { display: block !important; }
+
+        .btn { padding: 12px 24px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin: 5px; }
+        .btn-primary { background: #1d4ed8; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        
+        .logout-btn {
+            background: #dc3545; color: white; border: none;
+            padding: 12px 25px; border-radius: 25px; cursor: pointer;
+            font-weight: 700;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .google-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: #1d4ed8;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTH PAGE -->
+    <div id="authPage" class="login-container">
+        <div class="login-card">
+            <h2 id="authTitle"><i class="fas fa-chart-line"></i> Login</h2>
+            <form id="authForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="authUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" required>
+                </div>
+                <button type="submit" class="btn-login" id="authBtn">Masuk</button>
+            </form>
+            <div class="auth-toggle">
+                <p id="authToggleContainer">Belum punya akun? <span onclick="toggleAuth()" style="color: #1d4ed8; cursor: pointer; font-weight: bold; text-decoration: underline;">Sign Up</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="main-app">
+        <div class="container">
+            <div class="header">
+                <h1>Stock Picking & Trading Plan</h1>
+                <div class="user-section">
+                    <div class="user-info">
+                        <i class="fas fa-user"></i> <span id="userNameDisplay"></span>
+                    </div>
+                    <!-- ✅ LOGOUT TANPA REFRESH HALAMAN -->
+                    <button class="logout-btn" onclick="handleLogout()">Keluar</button>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'plan')">Plan</button>
+                <button class="tab-btn" onclick="switchTab(event, 'floating')">Floating</button>
+                <button class="tab-btn" onclick="switchTab(event, 'sold')">Terjual</button>
+                <button class="tab-btn" onclick="switchTab(event, 'history')">History</button>
+            </div>
+
+            <div id="plan" class="tab-content active">
+                <div class="admin-form">
+                    <div style="background: white; padding: 30px; border-radius: 25px; margin-bottom: 40px; color: #333;">
+                        <h3 id="formTitle">Tambah Trading Plan Baru</h3>
+                        <form id="stockForm">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                                <div class="form-group">
+                                    <label>Nama Saham</label>
+                                    <input type="text" id="stockName" required placeholder="Contoh: BBCA">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tanggal Beli</label>
+                                    <input type="date" id="buyDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Harga Beli</label>
+                                    <input type="number" id="buyPrice" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Harga Jual</label>
+                                    <input type="number" id="sellPrice" placeholder="Kosongkan jika belum terjual">
+                                </div>
+                                <div class="form-group">
+                                    <label>Strategi</label>
+                                    <select id="strategy">
+                                        <option value="Swing Trading">Swing Trading</option>
+                                        <option value="Day Trading">Day Trading</option>
+                                        <option value="Value Investing">Value Investing</option>
+                                        <option value="Momentum">Momentum</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select id="status">
+                                        <option value="floating">Floating</option>
+                                        <option value="bep">BEP</option>
+                                        <option value="sold">Terjual</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Note</label>
+                                <textarea id="note" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Simpan Plan</button>
+                            <button type="button" id="cancelEditBtn" class="btn btn-danger" style="display:none" onclick="resetForm()">Batal</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="planList" class="stock-grid"></div>
+            </div>
+
+            <div id="floating" class="tab-content"><div id="floatingList" class="stock-grid"></div></div>
+            <div id="sold" class="tab-content"><div id="soldList" class="stock-grid"></div></div>
+            <div id="history" class="tab-content"><div id="historyList"></div></div>
+        </div>
+    </div>
+
+    <!-- MODAL DETAIL -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"></h2>
+            <a id="googleFinanceLink" href="#" target="_blank" class="google-link">
+                <i class="fas fa-external-link-alt"></i> Lihat di Google Finance
+            </a>
+            <hr style="margin: 15px 0">
+            <div id="modalBody" style="margin: 20px 0; text-align: left; line-height: 2;"></div>
+            
+            <div id="realtimeCalc" style="background: #f0f4f8; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: left; display: none;">
+                <label style="font-weight: bold; color: #555;">Hitung Floating Real-time:</label>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <input type="number" id="currentPriceInput" placeholder="Harga saat ini..." style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ccc;">
+                    <button class="btn-success" onclick="calculateFloatingNow()" style="border:none; border-radius:8px; padding:0 15px;">Cek %</button>
+                </div>
+                <div id="realtimeResult" style="margin-top: 10px; font-weight: bold;"></div>
+            </div>
+
+            <button class="btn btn-primary admin-only" onclick="editPlan()">Edit</button>
+            <button class="btn btn-danger" onclick="closeModal()">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        let tradingPlans = JSON.parse(localStorage.getItem('tradingPlans')) || [];
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let currentUser = null;
+        let isAdmin = false;
+        let isSignUpMode = false;
+        let currentPlanIndex = -1;
+        let editMode = false;
+
+        const ADMIN_USERNAME = "Ferdhi";
+        const ADMIN_PASSWORD = "182764125";
+
+        function toggleAuth() {
+            isSignUpMode = !isSignUpMode;
+            const title = document.getElementById('authTitle');
+            const btn = document.getElementById('authBtn');
+            const container = document.getElementById('authToggleContainer');
+
+            if(isSignUpMode) {
+                title.innerText = 'Sign Up';
+                btn.innerText = 'Daftar Sekarang';
+                container.innerHTML = 'Sudah punya akun? <span onclick="toggleAuth()" style="color: #1d4ed8; cursor: pointer; font-weight: bold; text-decoration: underline;">Login</span>';
+            } else {
+                title.innerText = 'Login';
+                btn.innerText = 'Masuk';
+                container.innerHTML = 'Belum punya akun? <span onclick="toggleAuth()" style="color: #1d4ed8; cursor: pointer; font-weight: bold; text-decoration: underline;">Sign Up</span>';
+            }
+            document.getElementById('authForm').reset();
+        }
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('authUsername').value.trim();
+            const p = document.getElementById('authPassword').value.trim();
+
+            if (isSignUpMode) {
+                if (u === ADMIN_USERNAME) { alert("Admin dilarang!"); return; }
+                users[u] = p; localStorage.setItem('users', JSON.stringify(users));
+                alert("Berhasil! Silakan Login."); toggleAuth();
+            } else {
+                if (u === ADMIN_USERNAME && p === ADMIN_PASSWORD) {
+                    isAdmin = true; currentUser = u; document.body.classList.add('admin-user'); showApp();
+                } else if (users[u] && users[u] === p) {
+                    isAdmin = false; currentUser = u; document.body.classList.remove('admin-user'); showApp();
+                } else { alert("Salah!"); }
+            }
+        });
+
+        function showApp() {
+            document.getElementById('authPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('userNameDisplay').innerText = currentUser + (isAdmin ? " (ADMIN)" : "");
+            renderAll();
+        }
+
+        // ✅ PERBAIKAN LOGOUT: RESET MANUAL DOM TANPA REFRESH PATH
+        function handleLogout() {
+            currentUser = null;
+            isAdmin = false;
+            editMode = false;
+            
+            // Reset Tampilan
+            document.body.classList.remove('admin-user');
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('authPage').style.display = 'flex';
+            
+            // Reset Form-form
+            document.getElementById('authForm').reset();
+            resetForm();
+            
+            // Kembalikan ke mode login jika sedang di mode sign up
+            if(isSignUpMode) toggleAuth();
+        }
+
+        document.getElementById('stockForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const planData = {
+                id: editMode ? tradingPlans[currentPlanIndex].id : Date.now(),
+                stockName: document.getElementById('stockName').value.toUpperCase(),
+                buyDate: document.getElementById('buyDate').value,
+                buyPrice: parseFloat(document.getElementById('buyPrice').value),
+                sellPrice: document.getElementById('sellPrice').value ? parseFloat(document.getElementById('sellPrice').value) : null,
+                strategy: document.getElementById('strategy').value,
+                status: document.getElementById('status').value,
+                note: document.getElementById('note').value
+            };
+            if (editMode) tradingPlans[currentPlanIndex] = planData;
+            else tradingPlans.unshift(planData);
+            localStorage.setItem('tradingPlans', JSON.stringify(tradingPlans));
+            resetForm(); renderAll();
+            alert("Data Berhasil Disimpan!");
+        });
+
+        function renderAll() {
+            const pList = document.getElementById('planList');
+            const fList = document.getElementById('floatingList');
+            const sList = document.getElementById('soldList');
+            const hList = document.getElementById('historyList');
+
+            const createEmpty = (txt) => `<div class="empty-message"><i class="fas fa-info-circle"></i><br>${txt}</div>`;
+
+            pList.innerHTML = tradingPlans.filter(p => p.status !== 'sold').map(p => createCard(p)).join('') || createEmpty("Belum ada trading plan");
+            fList.innerHTML = tradingPlans.filter(p => p.status === 'floating').map(p => createCard(p)).join('') || createEmpty("Tidak ada saham floating");
+            sList.innerHTML = tradingPlans.filter(p => p.status === 'sold').map(p => createCard(p)).join('') || createEmpty("Belum ada saham terjual");
+            
+            const historyData = tradingPlans.filter(p => p.sellPrice !== null && p.sellPrice > 0);
+            hList.innerHTML = historyData.map(p => {
+                const profit = ((p.sellPrice - p.buyPrice) / p.buyPrice * 100).toFixed(2);
+                return `<div style="background:white; color:#333; padding:20px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="text-align:left"><strong>${p.stockName}</strong><br><small>${p.buyDate}</small></div>
+                    <div style="text-align:right"><strong style="color:${profit >= 0 ? 'green' : 'red'}">${profit}%</strong><br><small>Return</small></div>
+                </div>`;
+            }).join('') || createEmpty("Belum ada riwayat penjualan");
+        }
+
+        function createCard(p) {
+            const realIdx = tradingPlans.findIndex(x => x.id === p.id);
+            return `<div class="stock-preview" onclick="showDetail(${realIdx})"><div class="stock-name">${p.stockName}</div><div class="status-large status-${p.status}">${p.status.toUpperCase()}</div></div>`;
+        }
+
+        function showDetail(idx) {
+            currentPlanIndex = idx;
+            const p = tradingPlans[idx];
+            const profitRealized = p.sellPrice ? ((p.sellPrice - p.buyPrice) / p.buyPrice * 100).toFixed(2) : null;
+            
+            document.getElementById('modalTitle').innerText = p.stockName;
+            document.getElementById('googleFinanceLink').href = `https://www.google.com/finance/quote/${p.stockName}:IDX`;
+            
+            document.getElementById('modalBody').innerHTML = `
+                <b>Terbeli:</b> ${p.buyDate}<br>
+                <b>Harga Beli:</b> Rp ${p.buyPrice.toLocaleString()}<br>
+                <b>Strategi:</b> ${p.strategy}<br>
+                <b>Status:</b> ${p.status.toUpperCase()}<br>
+                ${p.sellPrice ? `<b>Terjual:</b> Rp ${p.sellPrice.toLocaleString()}<br><b>Profit/Loss:</b> <span style="color:${profitRealized >= 0 ? 'green' : 'red'}">${profitRealized}%</span><br>` : ''}
+                <b>Note:</b> ${p.note || '-'}
+            `;
+
+            if(p.status !== 'sold') {
+                document.getElementById('realtimeCalc').style.display = 'block';
+                document.getElementById('realtimeResult').innerText = '';
+                document.getElementById('currentPriceInput').value = '';
+            } else {
+                document.getElementById('realtimeCalc').style.display = 'none';
+            }
+            document.getElementById('detailModal').style.display = 'block';
+        }
+
+        function calculateFloatingNow() {
+            const p = tradingPlans[currentPlanIndex];
+            const curPrice = parseFloat(document.getElementById('currentPriceInput').value);
+            if(!curPrice) return;
+            const floatP = ((curPrice - p.buyPrice) / p.buyPrice * 100).toFixed(2);
+            document.getElementById('realtimeResult').innerHTML = `Floating: <span style="color:${floatP >= 0 ? 'green' : 'red'}">${floatP}%</span>`;
+        }
+
+        function editPlan() {
+            editMode = true; const p = tradingPlans[currentPlanIndex];
+            document.getElementById('stockName').value = p.stockName;
+            document.getElementById('buyDate').value = p.buyDate;
+            document.getElementById('buyPrice').value = p.buyPrice;
+            document.getElementById('sellPrice').value = p.sellPrice || '';
+            document.getElementById('strategy').value = p.strategy;
+            document.getElementById('status').value = p.status;
+            document.getElementById('note').value = p.note;
+            document.getElementById('formTitle').innerText = "Edit Plan: " + p.stockName;
+            document.getElementById('submitBtn').innerText = "Update Plan";
+            document.getElementById('cancelEditBtn').style.display = "inline-block";
+            closeModal(); window.scrollTo(0,0);
+        }
+
+        function resetForm() {
+            editMode = false; document.getElementById('stockForm').reset();
+            document.getElementById('formTitle').innerText = "Tambah Trading Plan Baru";
+            document.getElementById('submitBtn').innerText = "Simpan Plan";
+            document.getElementById('cancelEditBtn').style.display = "none";
+        }
+
+        function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+        
+        function switchTab(evt, tabName) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(tb => tb.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        window.onclick = function(e) { if(e.target == document.getElementById('detailModal')) closeModal(); }
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
